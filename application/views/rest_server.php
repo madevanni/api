@@ -96,9 +96,11 @@
         </p>
 
         <ol>
+            <li><a href="<?php echo site_url('api/example/partners'); ?>">Partners</a> - defaulting to JSON</li>
             <li><a href="<?php echo site_url('api/example/users'); ?>">Users</a> - defaulting to JSON</li>
             <li><a href="<?php echo site_url('api/example/users/format/csv'); ?>">Users</a> - get it in CSV</li>
             <li><a href="<?php echo site_url('api/example/users/id/1'); ?>">User #1</a> - defaulting to JSON  (users/id/1)</li>
+            <li><a href="<?php echo site_url('api/example/partners/id/PIJF001'); ?>">Partner #PIJF001</a> - defaulting to JSON  (users/id/1)</li>
             <li><a href="<?php echo site_url('api/example/users/1'); ?>">User #1</a> - defaulting to JSON  (users/1)</li>
             <li><a href="<?php echo site_url('api/example/users/id/1.xml'); ?>">User #1</a> - get it in XML (users/id/1.xml)</li>
             <li><a href="<?php echo site_url('api/example/users/id/1/format/xml'); ?>">User #1</a> - get it in XML (users/id/1/format/xml)</li>
@@ -109,7 +111,6 @@
             <li><a href="<?php echo site_url('api/example/users/format/html'); ?>">Users</a> - get it in HTML (users/format/html)</li>
             <li><a href="<?php echo site_url('api/example/users?format=html'); ?>">Users</a> - get it in HTML (users?format=html)</li>
         </ol>
-
     </div>
 
     <p class="footer">Page rendered in <strong>{elapsed_time}</strong> seconds. <?php echo  (ENVIRONMENT === 'development') ?  'CodeIgniter Version <strong>'.CI_VERSION.'</strong>' : '' ?></p>
