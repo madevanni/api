@@ -1,0 +1,1 @@
+SELECT t_pono AS position, t_sitm AS item, t_qana AS net_qty, t_scpf AS scrap_percent, t_scpq AS scrap_qty, t_cwar AS warehouse, t_indt AS effective_date, t_exdt AS expired_date FROM ttibom010111 WHERE ttibom010111.t_mitm LIKE '%GA409-A0510%';

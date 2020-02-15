@@ -1,10 +1,11 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 // This can be removed if you use __autoload() in config.php OR use Modular Extensions
 /** @noinspection PhpIncludeInspection */
 require APPPATH . 'libraries/REST_Controller.php';
+require APPPATH . 'libraries/Format.php';
 
 /**
  * This is an example of a few basic user interaction methods you could use
@@ -17,26 +18,43 @@ require APPPATH . 'libraries/REST_Controller.php';
  * @license         MIT
  * @link            https://github.com/chriskacerguis/codeigniter-restserver
  */
-class Sales extends REST_Controller {
+class Sales extends REST_Controller
+{
 
-    function __construct() {
+    function __construct()
+    {
         // Construct the parent class
         parent::__construct();
 
         $this->load->model('Sales_model');
+
+        date_default_timezone_set('Asia/Jakarta');
     }
 
-    public function partners_get() {
+    /**
+     * Business partners API
+     */
+    public function partners_get()
+    {
         $id = $this->get('id');
         if ($id == '') {
             $partners = $this->Sales_model->get_partners();
         } else {
             $partners = $this->Sales_model->get_partner($id);
         }
-        $this->response($partners, 200);
+
+        if ($partners) {
+            $this->response($partners, REST_Controller::HTTP_OK);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'Business partners not found!'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
     }
 
-    public function partners_post() {
+    public function partners_post()
+    {
         $limit = $this->post('limit');
         $offset = $this->post('offset');
         $id = $this->get('t_bpid');
@@ -45,7 +63,109 @@ class Sales extends REST_Controller {
         } else {
             $partners = $this->Sales_model->get_partner($id);
         }
-        $this->response($partners, 200);
+        $this->response([
+            'status' => true,
+            'data' => $partners
+        ], REST_Controller::HTTP_OK);
     }
 
+    /**
+     * Sales Models API
+     */
+    public function models_get()
+    {
+        $id = $this->get('id');
+        if ($id == '') {
+            $models = $this->Sales_model->get_models();
+        } else {
+            $models = $this->Sales_model->get_model($id);
+        }
+
+        if ($models) {
+            $this->response([
+                'status' => true,
+                'data' => $models
+            ], REST_Controller::HTTP_OK);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'Models not found!'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
+    }
+
+    public function models_post()
+    {
+        $data = [
+            'name' => $this->post('name'),
+            'created_by' => 1,
+            'created_on' => date('Y-m-d H:i:s')
+        ];
+
+        if($this->Sales_model->create_model($data) > 0) {
+            $this->response([
+                'status' => true,
+                'message' => 'New model created.'
+            ], REST_Controller::HTTP_CREATED);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'Failed to create new model!'
+            ], REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
+
+    public function models_put()
+    {
+        $id = $this->put('id');
+        $data = [
+            'name' => $this->put('name'),
+            'modified_by' => 1,
+            'modified_on' => date('Y-m-d H:i:s')
+        ];
+
+        if($this->Sales_model->update_model($data, $id) > 0) {
+            $this->response([
+                'status' => true,
+                'message' => 'Model has been updated.'
+            ], REST_Controller::HTTP_ACCEPTED);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'Failed to modified the model!'
+            ], REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
+
+    public function models_delete()
+    {
+        $id = $this->delete('id');
+        $data = [
+            'deleted' => 1,
+            'deleted_by' => 1,
+            'deleted_on' => date('Y-m-d H:i:s')
+        ];
+        if ($id === null) {
+            $this->response([
+                'status' => false,
+                'message' => 'Provide an id to delete.'
+            ], REST_Controller::HTTP_BAD_REQUEST);
+        } else {
+            if ($this->Sales_model->delete_model($data, $id) > 0) {
+                $this->response([
+                    'status' => true,
+                    'id' => $id,
+                    'message' => 'Model has been deleted.'
+                ], REST_Controller::HTTP_OK);
+            } else {
+                $this->response([
+                    'status' => false,
+                    'message' => 'ID Model not found.'
+                ], REST_Controller::HTTP_BAD_REQUEST);
+            }
+        }
+    }
+    /**
+     * SALES Model API End
+     */
 }
