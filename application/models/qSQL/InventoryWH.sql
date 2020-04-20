@@ -1,0 +1,1 @@
+SELECT REPLACE(t_item, ' ', '') AS item, t_cwar AS warehouse, t_qhnd AS inventory_on_hand, t_qblk AS inventory_blocked, t_qall AS inventory_allocated, t_qord AS inventory_on_order FROM twhwmd215111 WHERE t_cwar = 'WMPR';

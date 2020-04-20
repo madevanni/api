@@ -27,9 +27,9 @@ class Items extends REST_Controller
     {
         $id = $this->get('id');
         if ($id == '') {
-            $items = $this->Planning_model->get_items();
+            $items = $this->Item_model->get_items();
         } else {
-            $items = $this->Planning_model->get_item($id);
+            $items = $this->Item_model->get_item($id);
         }
 
         if ($items) {

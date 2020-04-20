@@ -102,7 +102,7 @@ class Sales extends REST_Controller
             'created_on' => date('Y-m-d H:i:s')
         ];
 
-        if($this->Sales_model->create_model($data) > 0) {
+        if ($this->Sales_model->create_model($data) > 0) {
             $this->response([
                 'status' => true,
                 'message' => 'New model created.'
@@ -124,7 +124,7 @@ class Sales extends REST_Controller
             'modified_on' => date('Y-m-d H:i:s')
         ];
 
-        if($this->Sales_model->update_model($data, $id) > 0) {
+        if ($this->Sales_model->update_model($data, $id) > 0) {
             $this->response([
                 'status' => true,
                 'message' => 'Model has been updated.'
@@ -161,6 +161,114 @@ class Sales extends REST_Controller
                 $this->response([
                     'status' => false,
                     'message' => 'ID Model not found.'
+                ], REST_Controller::HTTP_BAD_REQUEST);
+            }
+        }
+    }
+    /**
+     * SALES Model API End
+     */
+
+    /**
+     * Sales Forecast API
+     */
+    public function forecasts_get()
+    {
+        $id = $this->get('id');
+        if ($id == '') {
+            $forecasts = $this->Sales_model->get_forecast();
+        } else {
+            $forecasts = $this->Sales_model->get_forecast($id);
+        }
+
+        if ($forecasts) {
+            $this->response([
+                'status' => true,
+                'data' => $forecasts
+            ], REST_Controller::HTTP_OK);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'Models not found!'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
+    }
+
+    public function forecasts_post()
+    {
+        $data = [
+            'model_id' => $this->post('model_id'),
+            'psi_part_id' => $this->post('psi_part_id'),
+            'cust_id' => $this->post('cust_id'),
+            'sales_qty' => $this->post('sales_qty'),
+            'created_by' => 1,
+            'created_on' => date('Y-m-d H:i:s')
+        ];
+
+        if ($this->Sales_model->create_forecasts($data) > 0) {
+            $this->response([
+                'status' => true,
+                'message' => 'New forecast created.'
+            ], REST_Controller::HTTP_CREATED);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'Failed to create new forecast!'
+            ], REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
+
+    public function forecasts_put()
+    {
+        $id = $this->put('id');
+        $data = [
+            'model_id' => $this->post('model_id'),
+            'psi_part_id' => $this->post('psi_part_id'),
+            'cust_id' => $this->post('cust_id'),
+            'sales_qty' => $this->post('sales_qty'),
+            'fy' => $this->post('fy'),
+            'period' => $this->post('period'),
+            'modified_by' => 1,
+            'modified_on' => date('Y-m-d H:i:s')
+        ];
+
+        if ($this->Sales_model->update_forecasts($data, $id) > 0) {
+            $this->response([
+                'status' => true,
+                'message' => 'Forecasts has been updated.'
+            ], REST_Controller::HTTP_ACCEPTED);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'Failed to modified the forecasts!'
+            ], REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
+
+    public function forecasts_delete()
+    {
+        $id = $this->delete('id');
+        $data = [
+            'deleted' => 1,
+            'deleted_by' => 1,
+            'deleted_on' => date('Y-m-d H:i:s')
+        ];
+        if ($id === null) {
+            $this->response([
+                'status' => false,
+                'message' => 'Provide an id to delete.'
+            ], REST_Controller::HTTP_BAD_REQUEST);
+        } else {
+            if ($this->Sales_model->delete_forecasts($id) > 0) {
+                $this->response([
+                    'status' => true,
+                    'id' => $id,
+                    'message' => 'Forecasts has been deleted.'
+                ], REST_Controller::HTTP_OK);
+            } else {
+                $this->response([
+                    'status' => false,
+                    'message' => 'ID forecasts not found.'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
         }

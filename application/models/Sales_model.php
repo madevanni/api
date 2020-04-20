@@ -28,34 +28,34 @@ class Sales_model extends CI_Model {
 
     public function get_partners() {
         $this->erplndb->set_dbprefix('dbo_');
-        $query = $this->erplndb->query("SELECT ttccom100110.t_bpid AS id, ttccom100110.t_nama AS partners, ttccom130110.t_namc AS address, ttccom130110.t_pstc AS zipcode, ttccom130110.t_ccit AS city, ttccom130110.t_ccty AS country, ttccom130110.t_telp AS telephone, ttccom100110.t_ccur AS currency,
-        CASE (ttccom100110.t_bprl)
+        $query = $this->erplndb->query("SELECT ttccom100111.t_bpid AS id, ttccom100111.t_nama AS partners, ttccom130111.t_namc AS address, ttccom130111.t_pstc AS zipcode, ttccom130111.t_ccit AS city, ttccom130111.t_ccty AS country, ttccom130111.t_telp AS telephone, ttccom100111.t_ccur AS currency,
+        CASE (ttccom100111.t_bprl)
         WHEN 1 THEN 'unknown'
         WHEN 2 THEN 'customer'
         WHEN 3 THEN 'supplier'
         WHEN 4 THEN 'customer and supplier'
         END AS role,
-        CASE (ttccom100110.t_prst)
+        CASE (ttccom100111.t_prst)
         WHEN 1 THEN 'inactive'
         WHEN 2 THEN 'active'
-        END AS status FROM ttccom100110, ttccom130110 WHERE ttccom100110.t_cadr = ttccom130110.t_cadr");
+        END AS status FROM ttccom100111, ttccom130111 WHERE ttccom100111.t_cadr = ttccom130111.t_cadr");
         return $query->result();
     }
 
     public function get_partner($id) {
         $this->erplndb->set_dbprefix('dbo_');
         $this->erplndb->protect_identifiers($id);
-        $query = $this->erplndb->query("SELECT ttccom100110.t_nama AS partners, ttccom130110.t_namc AS address, ttccom130110.t_pstc AS zipcode, ttccom130110.t_ccit AS city, ttccom130110.t_ccty AS country, ttccom130110.t_telp AS telephone, ttccom100110.t_ccur AS currency,
-        CASE (ttccom100110.t_bprl)
+        $query = $this->erplndb->query("SELECT ttccom100111.t_nama AS partners, ttccom130111.t_namc AS address, ttccom130111.t_pstc AS zipcode, ttccom130111.t_ccit AS city, ttccom130111.t_ccty AS country, ttccom130111.t_telp AS telephone, ttccom100111.t_ccur AS currency,
+        CASE (ttccom100111.t_bprl)
         WHEN 1 THEN 'unknown'
         WHEN 2 THEN 'customer'
         WHEN 3 THEN 'supplier'
         WHEN 4 THEN 'customer and supplier'
         END AS role,
-        CASE (ttccom100110.t_prst)
+        CASE (ttccom100111.t_prst)
         WHEN 1 THEN 'inactive'
         WHEN 2 THEN 'active'
-        END AS status FROM ttccom100110, ttccom130110 WHERE ttccom100110.t_cadr = ttccom130110.t_cadr AND ttccom100110.t_bpid = '$id'");
+        END AS status FROM ttccom100111, ttccom130111 WHERE ttccom100111.t_cadr = ttccom130111.t_cadr AND ttccom100111.t_bpid = '$id'");
         return $query->result();
     }
 
@@ -87,7 +87,37 @@ class Sales_model extends CI_Model {
 
     public function delete_model($data, $id)
     {
-        $this->bonfire->update('models', $data, ['id' => $id]);
+        $this->bonfire->delete('models', ['id' => $id]);
+        return $this->bonfire->affected_rows();
+    }
+    
+    public function get_forecast($id)
+    {
+        if ($id == '') {
+            $this->bonfire->get('forecast');
+            return $this->bonfire->affected_rows();
+        } else {
+            $this->bonfire->where('id', $id);
+            $query = $this->bonfire->get('forecast');
+            return $query->result();
+        }
+    }
+    
+    public function create_forecasts($data)
+    {
+        $this->bonfire->insert('forecast', $data);
+        return $this->bonfire->affected_rows();
+    }
+    
+    public function update_forecasts($data, $id)
+    {
+        $this->bonfire->update('forecast', $data, ['id' => $id]);
+        return $this->bonfire->affected_rows();
+    }
+
+    public function delete_forecasts($id)
+    {
+        $this->bonfire->delete('forecast', ['id' => $id]);
         return $this->bonfire->affected_rows();
     }
 
