@@ -75,17 +75,16 @@ class Sales extends REST_Controller
     public function models_get()
     {
         $id = $this->get('id');
+        $limit = $this->get('limit');
+        $page = $this->get('page');
         if ($id == '') {
-            $models = $this->Sales_model->get_models();
+            $models = $this->Sales_model->get_models(($page - 1) * $limit, $limit);
         } else {
             $models = $this->Sales_model->get_model($id);
         }
 
         if ($models) {
-            $this->response([
-                'status' => true,
-                'data' => $models
-            ], REST_Controller::HTTP_OK);
+            $this->response($models, REST_Controller::HTTP_OK);
         } else {
             $this->response([
                 'status' => false,
@@ -98,7 +97,7 @@ class Sales extends REST_Controller
     {
         $data = [
             'name' => $this->post('name'),
-            'created_by' => 1,
+            'created_by' => $this->post('created_by'),
             'created_on' => date('Y-m-d H:i:s')
         ];
 
@@ -120,7 +119,7 @@ class Sales extends REST_Controller
         $id = $this->put('id');
         $data = [
             'name' => $this->put('name'),
-            'modified_by' => 1,
+            'modified_by' => $this->post('modified_by'),
             'modified_on' => date('Y-m-d H:i:s')
         ];
 

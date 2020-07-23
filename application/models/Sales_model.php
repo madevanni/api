@@ -22,6 +22,7 @@ class Sales_model extends CI_Model {
      */
     function __construct() {
         parent::__construct();
+        
         $this->bonfire = $this->load->database('bonfire', TRUE);
         $this->erplndb = $this->load->database('erplnDB', TRUE);
     }
@@ -59,12 +60,16 @@ class Sales_model extends CI_Model {
         return $query->result();
     }
 
-    public function get_models() {
-        // $this->bonfire->set_dbprefix('bf_');
-        // $this->bonfire->select("id, name model, created_by, created_on, modified_on");
-        // $query = $this->bonfire->get('models');
-        $query = $this->bonfire->query("SELECT bf_models.id, bf_models.name model, bf_users.username created_by, bf_models.created_on, bf_models.modified_on, bf_users.username FROM bf_models, bf_users WHERE bf_models.created_by=bf_users.id");
-        return $query->result();
+    public function get_models($offset = NULL, $limit = NULL) {
+        $this->bonfire->set_dbprefix('bf_');
+        // $this->bonfire->where('deleted', '!=1'); // for users without deleted records
+        $models['total'] = strval($this->bonfire->get('models')->num_rows());
+        $this->bonfire->select("models.id, models.name, users.username, models.created_on");
+        $this->bonfire->from('models');
+        $this->bonfire->join('users', 'users.id = models.created_by');
+        $this->bonfire->limit($limit, $offset);
+        $models['rows'] = $this->bonfire->get()->result_array();
+        return $models;
     }
 
     public function get_model($id) {
@@ -87,7 +92,7 @@ class Sales_model extends CI_Model {
 
     public function delete_model($data, $id)
     {
-        $this->bonfire->delete('models', ['id' => $id]);
+        $this->bonfire->update('models', $data, ['id' => $id]);
         return $this->bonfire->affected_rows();
     }
     
