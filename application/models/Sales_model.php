@@ -27,8 +27,16 @@ class Sales_model extends CI_Model {
         $this->erplndb = $this->load->database('erplnDB', TRUE);
     }
 
-    public function get_partners() {
+    public function get_partners($offset = NULL, $limit = NULL) {
         $this->erplndb->set_dbprefix('dbo_');
+        
+        $partners['status'] = true;
+        $partners['total'] = strval($this->erplndb->query(
+            "SELECT * FROM ttccom100111, ttccom130111 
+            WHERE ttccom100111.t_cadr = ttccom130111.t_cadr AND ttccom100111.t_prst = 2")->num_rows());
+        $partners['limit'] = $limit;
+        $partners['offset'] = $offset;
+
         $query = $this->erplndb->query("SELECT ttccom100111.t_bpid AS id, ttccom100111.t_nama AS partners, ttccom130111.t_namc AS address, ttccom130111.t_pstc AS zipcode, ttccom130111.t_ccit AS city, ttccom130111.t_ccty AS country, ttccom130111.t_telp AS telephone, ttccom100111.t_ccur AS currency,
         CASE (ttccom100111.t_bprl)
         WHEN 1 THEN 'unknown'
@@ -39,8 +47,10 @@ class Sales_model extends CI_Model {
         CASE (ttccom100111.t_prst)
         WHEN 1 THEN 'inactive'
         WHEN 2 THEN 'active'
-        END AS status FROM ttccom100111, ttccom130111 WHERE ttccom100111.t_cadr = ttccom130111.t_cadr");
-        return $query->result();
+        END AS status FROM ttccom100111, ttccom130111 WHERE ttccom100111.t_cadr = ttccom130111.t_cadr AND ttccom100111.t_prst = 2");
+
+        $partners['rows'] = $query->result();
+        return $partners;
     }
 
     public function get_partner($id) {
@@ -63,8 +73,9 @@ class Sales_model extends CI_Model {
     public function get_models($offset = NULL, $limit = NULL) {
         $this->bonfire->set_dbprefix('bf_');
         // $this->bonfire->where('deleted', '!=1'); // for users without deleted records
+        $models['status'] = true;
         $models['total'] = strval($this->bonfire->get('models')->num_rows());
-        $this->bonfire->select("models.id, models.name, users.username, models.created_on");
+        $this->bonfire->select("models.id, models.desc, users.username, models.deleted, models.created_on, models.modified_on");
         $this->bonfire->from('models');
         $this->bonfire->join('users', 'users.id = models.created_by');
         $this->bonfire->limit($limit, $offset);

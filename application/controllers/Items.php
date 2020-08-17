@@ -19,17 +19,44 @@ class Items extends REST_Controller
 
         date_default_timezone_set('Asia/Jakarta');
     }
-
+    
     /**
-     * Items API
+     * API for items details with pagination
+     * 
+     * @param string $status if returning value /false - no value returned
+     * @param int $total return total rows of items
+     * @param array $rows return data items in array format
+     *
+     * @return JSON
      */
     public function details_get()
     {
+        $limit = $this->get('limit');
+        $offset = $this->get('offset');
         $id = $this->get('id');
         if ($id == '') {
-            $items = $this->Item_model->get_items();
+            $items = $this->Item_model->get_items($offset, $limit);
         } else {
             $items = $this->Item_model->get_item($id);
+        }
+
+        if ($items) {
+            $this->response($items, REST_Controller::HTTP_OK);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'Items not found!'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
+    }
+    
+    public function stock_get()
+    {
+        $id = $this->get('id');
+        if ($id == '') {
+            $items = $this->Item_model->get_stock_all();
+        } else {
+            $items = $this->Item_model->get_stock($id);
         }
 
         if ($items) {
@@ -40,7 +67,7 @@ class Items extends REST_Controller
         } else {
             $this->response([
                 'status' => false,
-                'message' => 'Items not found!'
+                'message' => 'Items stock not found!'
             ], REST_Controller::HTTP_NOT_FOUND);
         }
     }
