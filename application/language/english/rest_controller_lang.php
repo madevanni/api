@@ -16,3 +16,15 @@ $lang['text_rest_api_key_time_limit'] = 'This API key has reached the time limit
 $lang['text_rest_ip_address_time_limit'] = 'This IP Address has reached the time limit for this method';
 $lang['text_rest_unknown_method'] = 'Unknown method';
 $lang['text_rest_unsupported'] = 'Unsupported protocol';
+
+//------------------------------------------------------------------------------
+// Model
+//------------------------------------------------------------------------------
+$lang['model_db_error']		= 'DB Error: %s';
+$lang['model_no_data']		= 'No data available.';
+$lang['model_invalid_id']	= 'Invalid ID passed to model.';
+$lang['model_no_table']		= 'Model has unspecified database table.';
+$lang['model_fetch_error']	= 'Not enough information to fetch field.';
+$lang['model_count_error']	= 'Not enough information to count results.';
+$lang['model_unique_error']	= 'Not enough information to check uniqueness.';
+$lang['model_find_error']	= 'Not enough information to find by.';

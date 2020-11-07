@@ -40,7 +40,7 @@ class Item_model extends CI_Model
         $items['limit'] = $limit;
         $items['offset'] = $offset;
 
-        $query = $this->erplndb->query("SELECT TOP 100 REPLACE(ttcibd001111.t_item, ' ', '') AS id, ttcibd001111.t_dsca AS description, 
+        $query = $this->erplndb->query("SELECT REPLACE(ttcibd001111.t_item, ' ', '') AS id, ttcibd001111.t_dsca AS description, 
         CASE (ttcibd001111.t_kitm)
         WHEN 1 THEN 'Purchased'
         WHEN 2 THEN 'Manufactured'

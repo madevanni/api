@@ -72,13 +72,14 @@ class Sales extends REST_Controller
     /**
      * Sales Models API
      */
+    // Model
     public function models_get()
     {
         $id = $this->get('id');
         $limit = $this->get('limit');
-        $page = $this->get('page');
+        $offset = $this->get('offset');
         if ($id == '') {
-            $models = $this->Sales_model->get_models(($page - 1) * $limit, $limit);
+            $models = $this->Sales_model->get_models($offset, $limit);
         } else {
             $models = $this->Sales_model->get_model($id);
         }
@@ -88,7 +89,19 @@ class Sales extends REST_Controller
         } else {
             $this->response([
                 'status' => false,
-                'message' => 'Models not found!'
+                'message' => 'model not found!'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
+    }
+    public function modelsCountAll_get()
+    {
+        $countAll = $this->Sales_model->get_modelsCountAll();
+        if ($countAll) {
+            $this->response($countAll, REST_Controller::HTTP_OK);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'No records found!'
             ], REST_Controller::HTTP_NOT_FOUND);
         }
     }
@@ -96,7 +109,7 @@ class Sales extends REST_Controller
     public function models_post()
     {
         $data = [
-            'name' => $this->post('name'),
+            'desc' => $this->post('name'),
             'created_by' => $this->post('created_by'),
             'created_on' => date('Y-m-d H:i:s')
         ];
@@ -118,8 +131,8 @@ class Sales extends REST_Controller
     {
         $id = $this->put('id');
         $data = [
-            'name' => $this->put('name'),
-            'modified_by' => $this->post('modified_by'),
+            'desc' => $this->put('name'),
+            'modified_by' => $this->put('modified_by'),
             'modified_on' => date('Y-m-d H:i:s')
         ];
 
@@ -141,8 +154,7 @@ class Sales extends REST_Controller
         $id = $this->delete('id');
         $data = [
             'deleted' => 1,
-            'deleted_by' => 1,
-            'deleted_on' => date('Y-m-d H:i:s')
+            'deleted_by' => $this->delete('user_id')
         ];
         if ($id === null) {
             $this->response([
@@ -174,21 +186,34 @@ class Sales extends REST_Controller
     public function forecasts_get()
     {
         $id = $this->get('id');
+        $limit = $this->get('limit');
+        $offset = $this->get('offset');
         if ($id == '') {
-            $forecasts = $this->Sales_model->get_forecast();
+            $forecasts = $this->Sales_model->get_forecasts($offset, $limit);
         } else {
             $forecasts = $this->Sales_model->get_forecast($id);
         }
 
         if ($forecasts) {
-            $this->response([
-                'status' => true,
-                'data' => $forecasts
-            ], REST_Controller::HTTP_OK);
+            $this->response($forecasts, REST_Controller::HTTP_OK);
         } else {
             $this->response([
                 'status' => false,
-                'message' => 'Models not found!'
+                'message' => 'Forecast not found!'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
+    }
+
+    public function forecastsCountAll_get()
+    {
+        $countAll = $this->Sales_model->get_forecastsCountAll();
+
+        if ($countAll) {
+            $this->response($countAll, REST_Controller::HTTP_OK);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'No records found!'
             ], REST_Controller::HTTP_NOT_FOUND);
         }
     }
@@ -197,8 +222,12 @@ class Sales extends REST_Controller
     {
         $data = [
             'model_id' => $this->post('model_id'),
-            'psi_part_id' => $this->post('psi_part_id'),
-            'cust_id' => $this->post('cust_id'),
+            'item_id' => $this->post('item_id'),
+            'bp_id' => $this->post('bp_id'),
+            'sales_qty' => $this->post('sales_qty'),
+            'cust_part' => $this->post('cust_part'),
+            'fy' => $this->post('fy'),
+            'period' => $this->post('period'),
             'sales_qty' => $this->post('sales_qty'),
             'created_by' => 1,
             'created_on' => date('Y-m-d H:i:s')
@@ -221,13 +250,13 @@ class Sales extends REST_Controller
     {
         $id = $this->put('id');
         $data = [
-            'model_id' => $this->post('model_id'),
-            'psi_part_id' => $this->post('psi_part_id'),
-            'cust_id' => $this->post('cust_id'),
-            'sales_qty' => $this->post('sales_qty'),
-            'fy' => $this->post('fy'),
-            'period' => $this->post('period'),
-            'modified_by' => 1,
+            'model_id' => $this->put('model_id'),
+            'item_id' => $this->put('item_id'),
+            'bp_id' => $this->put('bp_id'),
+            'sales_qty' => $this->put('sales_qty'),
+            'fy' => $this->put('fy'),
+            'period' => $this->put('period'),
+            'modified_by' => $this->put('user_id'),
             'modified_on' => date('Y-m-d H:i:s')
         ];
 
@@ -247,9 +276,10 @@ class Sales extends REST_Controller
     public function forecasts_delete()
     {
         $id = $this->delete('id');
+        $user_id = $this->delete('user_id');
         $data = [
             'deleted' => 1,
-            'deleted_by' => 1,
+            'deleted_by' => $user_id,
             'deleted_on' => date('Y-m-d H:i:s')
         ];
         if ($id === null) {
@@ -258,7 +288,7 @@ class Sales extends REST_Controller
                 'message' => 'Provide an id to delete.'
             ], REST_Controller::HTTP_BAD_REQUEST);
         } else {
-            if ($this->Sales_model->delete_forecasts($id) > 0) {
+            if ($this->Sales_model->delete_forecasts($id, $user_id) > 0) {
                 $this->response([
                     'status' => true,
                     'id' => $id,
@@ -275,4 +305,31 @@ class Sales extends REST_Controller
     /**
      * SALES Model API End
      */
+
+    /**
+     * Sales Forecast API
+     */
+    public function stock_get()
+    {
+        $id = $this->get('id');
+        $limit = $this->get('limit');
+        $offset = $this->get('offset');
+        if ($id == '') {
+            $stocks = $this->Sales_model->get_stocks($offset, $limit);
+        } else {
+            $stocks = $this->Sales_model->get_stock($id);
+        }
+
+        if ($stocks) {
+            $this->response($stocks, REST_Controller::HTTP_OK);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'Stock not found!'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
+    }
+
+
+    
 }
