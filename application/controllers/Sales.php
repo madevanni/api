@@ -36,12 +36,27 @@ class Sales extends REST_Controller
      */
     public function partners_get()
     {
-        $id = $this->get('id');
+        $id = $this->get('bp_id');
         if ($id == '') {
             $partners = $this->Sales_model->get_partners();
         } else {
             $partners = $this->Sales_model->get_partner($id);
         }
+
+        if ($partners) {
+            $this->response($partners, REST_Controller::HTTP_OK);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'Business partners not found!'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
+    }
+    
+    public function partnersDesc_get()
+    {
+        $id = $this->get('bp_id');
+        $partners = $this->Sales_model->get_name($id);
 
         if ($partners) {
             $this->response($partners, REST_Controller::HTTP_OK);
@@ -154,7 +169,7 @@ class Sales extends REST_Controller
         $id = $this->delete('id');
         $data = [
             'deleted' => 1,
-            'deleted_by' => $this->delete('user_id')
+            'deleted_by' => $this->delete('deleted_by')
         ];
         if ($id === null) {
             $this->response([

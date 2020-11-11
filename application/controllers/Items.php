@@ -19,7 +19,7 @@ class Items extends REST_Controller
 
         date_default_timezone_set('Asia/Jakarta');
     }
-    
+
     /**
      * API for items details with pagination
      * 
@@ -49,10 +49,25 @@ class Items extends REST_Controller
             ], REST_Controller::HTTP_NOT_FOUND);
         }
     }
-    
+
+    public function name_get()
+    {
+        $id = $this->get('item_id');
+        $name = $this->Item_model->get_name($id);
+
+        if($name) {
+            $this->response($name, REST_Controller::HTTP_OK);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'Item description not found!'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
+    }
+
     public function stock_get()
     {
-        $id = $this->get('id');
+        $id = $this->get('item_id');
         if ($id == '') {
             $items = $this->Item_model->get_stock_all();
         } else {
@@ -60,10 +75,7 @@ class Items extends REST_Controller
         }
 
         if ($items) {
-            $this->response([
-                'status' => true,
-                'data' => $items
-            ], REST_Controller::HTTP_OK);
+            $this->response($items, REST_Controller::HTTP_OK);
         } else {
             $this->response([
                 'status' => false,
@@ -71,7 +83,7 @@ class Items extends REST_Controller
             ], REST_Controller::HTTP_NOT_FOUND);
         }
     }
-    
+
     public function bom_get()
     {
         $id = $this->get('id');
@@ -83,7 +95,7 @@ class Items extends REST_Controller
         } else {
             $bom = $this->Item_model->get_bom($id);
         }
-        
+
         if ($bom) {
             $this->response([
                 'status' => true,
@@ -95,10 +107,8 @@ class Items extends REST_Controller
                 'message' => 'Build of material not found!'
             ], REST_Controller::HTTP_NOT_FOUND);
         }
-        
     }
     /**
      * Planning Items API end
      */
-    
 }

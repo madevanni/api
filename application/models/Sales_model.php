@@ -53,14 +53,14 @@ class Sales_model extends CI_Model
 
     public function get_forecasts($offset = NULL, $limit = NULL)
     {
-        $this->bonfire->set_dbprefix('bf_');
-        $forecast['total'] = strval($this->bonfire->get($this->forecast_tableName)->num_rows());
-        $this->bonfire->select("forecast.*, models.desc");
+        $result['status'] = true;
+        $result['total'] = $this->get_forecastsCountAll();
+        $this->bonfire->select($this->forecast_tableName.".*, ".$this->models_tableName.".desc");
         $this->bonfire->from($this->forecast_tableName);
         $this->bonfire->join('models', 'models.id = forecast.model_id');
-        // $this->bonfire->where('forecast.deleted', '!=1');
+        $this->bonfire->where('forecast.deleted', '!=1');
         $this->bonfire->limit($limit, $offset);
-        $result = $this->bonfire->get()->result_array();
+        $result['rows'] = $this->bonfire->get()->result_array();
 
         /**
          * try using cache to combine mysql and SQL server
@@ -157,6 +157,12 @@ class Sales_model extends CI_Model
         WHEN 1 THEN 'inactive'
         WHEN 2 THEN 'active'
         END AS status FROM ttccom100111, ttccom130111 WHERE ttccom100111.t_cadr = ttccom130111.t_cadr AND ttccom100111.t_bpid = '$id'");
+        return $query->result();
+    }
+
+    public function get_name($id)
+    {
+        $query = $this->erplndb->query("SELECT ttccom100111.t_nama AS bp_desc FROM ttccom100111 WHERE ttccom100111.t_bpid LIKE '%$id'");
         return $query->result();
     }
 

@@ -1,8 +1,5 @@
-SELECT * FROM ttcibd100111 WHERE t_item LIKE '%N1429-A0110%';
--- t_stoc = on hand
--- t_blck = blocked
--- t_ordr = on order
--- t_allo = allocated
--- t_hall = committed
--- ltdt = last transaction date
--- economic stock (on hand + allocated)
+SELECT * FROM twhwmd215111 WHERE t_item LIKE '%N1184-A0010' AND t_cwar = 'WMFGL';
+-- t_qhnd = on hand
+-- t_cwar = warehouse
+-- t_ltdt = last transaction date
+-- t_item = item code

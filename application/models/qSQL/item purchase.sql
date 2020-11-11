@@ -1,0 +1,1 @@
+SELECT * FROM ttccom100111;

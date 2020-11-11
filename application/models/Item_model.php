@@ -57,7 +57,7 @@ class Item_model extends CI_Model
     public function get_item($id)
     {
         $this->erplndb->set_dbprefix('dbo_');
-        $query = $this->erplndb->query("SELECT TOP 100 REPLACE(ttcibd001111.t_item, ' ', '') AS id, ttcibd001111.t_dsca AS description, 
+        $query = $this->erplndb->query("SELECT REPLACE(ttcibd001111.t_item, ' ', '') AS item_id, ttcibd001111.t_dsca AS description, 
         CASE (ttcibd001111.t_kitm)
         WHEN 1 THEN 'Purchased'
         WHEN 2 THEN 'Manufactured'
@@ -67,6 +67,12 @@ class Item_model extends CI_Model
         END AS item_type, ttcibd001111.t_seak AS search_key, ttcibd001111.t_citg AS item_group, ttcmcs023111.t_dsca AS item_group_desc, ttcibd001111.t_cuni AS unit 
         FROM ttcibd001111, ttcmcs023111
         WHERE ttcibd001111.t_citg = ttcmcs023111.t_citg AND ttcibd001111.t_item LIKE '%$id'");
+        return $query->result();
+    }
+
+    public function get_name($id)
+    {
+        $query = $this->erplndb->query("SELECT ttcibd001111.t_dsca AS item_desc FROM ttcibd001111 WHERE ttcibd001111.t_item LIKE '%$id'");
         return $query->result();
     }
 
@@ -81,9 +87,8 @@ class Item_model extends CI_Model
 
     public function get_stock($id)
     {
-        $this->erplndb->set_dbprefix('dbo_');
-        $this->erplndb->select('t_item, t_stoc, t_ltdt')->from('ttcibd100111')->where('t_item', $id);
-        return $this->erplndb->get()->result();
+        $query = $this->erplndb->query("SELECT REPLACE(twhwmd215111.t_item, ' ','') AS item_id, twhwmd215111.t_qhnd AS stock, twhwmd215111.t_ltdt AS inv_date FROM twhwmd215111 WHERE t_item LIKE '%$id' AND t_cwar = 'WMFGL'");
+        return $query->row();
     }
 
     public function get_bom($id)
